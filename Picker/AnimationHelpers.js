@@ -17,6 +17,8 @@ import Animated, {
 import {State} from 'react-native-gesture-handler';
 import {snapPoint} from 'react-native-redash';
 
+import {ITEM_HEIGHT} from './Constants';
+
 export const withDecay = params => {
   const {
     value,
@@ -24,6 +26,7 @@ export const withDecay = params => {
     state: gestureState,
     offset,
     snapPoints,
+    defaultValue,
   } = {
     ...params,
   };
@@ -42,7 +45,13 @@ export const withDecay = params => {
   };
 
   return block([
-    cond(not(init), [set(state.position, offset), set(init, 1)]),
+    cond(
+      cond(not(init), [
+        set(offset, -ITEM_HEIGHT * defaultValue),
+        set(state.position, offset),
+        set(init, 1),
+      ]),
+    ),
     cond(eq(gestureState, State.BEGAN), set(offset, state.position)),
     cond(eq(gestureState, State.ACTIVE), [
       set(state.position, add(offset, value)),

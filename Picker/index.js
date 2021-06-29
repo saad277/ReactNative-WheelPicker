@@ -17,7 +17,7 @@ const PickerDemo = () => {
   const [selected, setSelected] = useState(5);
 
   const change = (val, index) => {
-    setSelected(index);
+    console.log('indexxxx->>>>', index);
   };
 
   const renderItem = (item, index) => {

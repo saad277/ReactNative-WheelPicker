@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 import {usePanGestureHandler} from 'react-native-redash';
+import {useMemoOne} from 'use-memo-one';
 
 import {ITEM_HEIGHT} from './Constants';
 import {withDecay} from './AnimationHelpers';
@@ -25,13 +26,18 @@ const GestureHandler = props => {
   const {gestureHandler, translation, velocity, state} = usePanGestureHandler();
   const snapPoints = new Array(max).fill(0).map((_, i) => i * -ITEM_HEIGHT);
 
-  const translateY = withDecay({
-    value: translation.y,
-    velocity: velocity.y,
-    state,
-    snapPoints,
-    offset: new Value(-ITEM_HEIGHT * defaultValue),
-  });
+  const translateY = useMemoOne(
+    () =>
+      withDecay({
+        value: translation.y,
+        velocity: velocity.y,
+        state,
+        snapPoints,
+        offset: new Value(-ITEM_HEIGHT * defaultValue),
+        defaultValue,
+      }),
+    [values],
+  );
 
   useCode(() => [set(value, add(translateY, ITEM_HEIGHT * 2))], []);
 
@@ -42,8 +48,6 @@ const GestureHandler = props => {
 
       if (onValueChange && newValue) {
         onValueChange(newValue, Math.abs(selectedIndex));
-
-        console.log("index--->",selectedIndex)
       }
     });
   }, [translateY]);
